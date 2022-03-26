@@ -68,7 +68,6 @@ function CrearHistorialProduccion(iteraciones){
     month % 13 == 0 ? (month = 1, year++) : ''
     i++;
     }
-
 }
 
 
@@ -90,13 +89,15 @@ try {
 var menu = require('console-menu');
 const { InsertarHistorialProduccion } = require('./db/dbconnection');
 menu([
-    { hotkey: '1', title: 'Transacciones por Fecha', selected: true },
-    { hotkey: '2', title: 'Transacciones por Fecha y Tipo de Tarea'},
-    { hotkey: '3', title: 'Resumen por Actividad, Pagos y Cant. de Unidades' },
-    { hotkey: '4', title: 'Unidades Trabajadas por Fecha' },
-    { hotkey: '5', title: 'Insertar Movimientos (HistorialProduccion)' },
-    { hotkey: '6', title: 'Actualizar Movimientos (HistorialProduccion)' },
-    { hotkey: '7', title: 'Eliminar Movimientos (HistorialProduccion)' },
+    { hotkey: '1', title: 'Transacciones por Fecha Aleatoria', selected: true },
+    { hotkey: '2', title: 'Transacciones por Fecha Aleatoria y Tipo de Tarea'},
+    { hotkey: '3', title: 'Transacciones por Fecha y Empleado'},
+    { hotkey: '4', title: 'Unidades Trabajadas por Departamento'},
+    { hotkey: '5', title: 'Unidades y Pagos Por Rango de Fechas'},
+    { hotkey: '6', title: 'Unidades Por Dia y Departamento' },
+    { hotkey: '7', title: 'Insertar Movimientos (HistorialProduccion)' },
+    { hotkey: '8', title: 'Actualizar Movimientos (HistorialProduccion)' },
+    { hotkey: '9', title: 'Eliminar Movimientos (HistorialProduccion)' },
     { separator: true },
     { hotkey: '?', title: 'Help' },
 ], {
@@ -105,60 +106,154 @@ menu([
 }).then(item => {
     if (item) {
         // console.log(item.hotkey);
+        const prompt = require("prompt-sync")();
         let manejadorResultados = []
         switch(parseInt(item.hotkey)){
             case 1:
-                    const prompt = require("prompt-sync")();
-                    console.log('\tTransacciones por Fecha\n');
+                    console.log('\tTransacciones por Fecha Aleatoria\n');
 
-                    // console.log('Formato de Fechas 2000-12-31 14:30:30.00');
-                    // console.log('\n');
-                    // const from = prompt("Inserta primer fecha: ");
-                    // console.log(`Tu primer fecha es '${from}'.`);
-                    // console.log('\n');
-                    // const to = prompt("Inserta segunda fecha: ");
-                    // console.log(`Tu segunda fecha es '${to}'.`);
-                    // console.log('\n');
                     const iter = prompt("Inserta cantidad de iteraciones: ");
                     console.clear();
                     console.log(`La seleccion será de '${iter} datos'.`);
+                    console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
                     for(let prim = 0; prim < iter; prim++){
-                        manejadorResultados.push(Db.ObtenerHistorialProduccion(
-                            date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}),
-                            date({from: new Date('2003-01-01'), to: new Date('2004-12-31')})
-                        ))
+                        manejadorResultados.push(Db.ObtenerHistorialProduccion({
+                            HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                            HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON()
+                        }))
                     }
-                    console.log(manejadorResultados);
+                    console.log('');
+                    manejadorResultados[0].then(dat => {
+                        console.table(dat[0]);
+                    })
 
                 break;
                 
             case 2:
-                console.log('\tTransacciones por Fecha y Tipo de Tarea\n');
+                console.log('\tTransacciones por Fecha Aleatoria y Tipo de Tarea\n');
+                const iter2 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter2} datos'.`);
+                console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
+                let Id = Math.floor(Math.random() * (11 - 1 + 1)) + 1;
+                for(let prim = 0; prim < iter2; prim++){
+                    manejadorResultados.push(Db.ObtenerHistorialPasosPeriodo({
+                        HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                        HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON(),
+                        IdPaso: Id
+                    }))
+                }
+                console.log('');
+                manejadorResultados[0].then(dat => {
+                    console.table(dat[0]);
+                })
                 break;
                 
             case 3:
-                console.log('\tResumen por Actividad, Pagos y Cant. de Unidades\n');
+                console.log('\tTransacciones por Fecha y Empleado\n');
+                const iter3 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter3} datos'.`);
+                console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
+                let IdEmpleado = Math.floor(Math.random() * (115 - 76 + 1)) + 76;
+                for(let prim = 0; prim < iter3; prim++){
+                    manejadorResultados.push(Db.ObtenerHistorialEmpleadoPeriodo({
+                        HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                        HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON(),
+                        IdEmpleado: IdEmpleado
+                    }))
+                }
+                manejadorResultados[0].then(dat => {
+                    console.table(dat[0]);
+                })
                 break;
                 
             case 4:
-                console.log('\tUnidades Trabajadas por Fecha\n');
+                console.log('\tUnidades Trabajadas por Departamento\n');
+                const iter4 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter4} datos'.`);
+                console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
+                for(let prim = 0; prim < iter4; prim++){
+                    manejadorResultados.push(Db.ObtenerHistorialDepartamento({
+                        HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                        HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON()
+                    }))
+                }
+                manejadorResultados[0].then(dat => {
+                    console.table(dat[0]);
+                })
                 break;
 
             case 5:
-                console.log('\tInsertar Movimientos (HistorialProduccion)\n');
-                    // CrearHistorialProduccion()
+                console.log('\tUnidades y Pagos Por Rango de Fechas\n');
+                const iter5 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter5} datos'.`);
+                console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
+                for(let prim = 0; prim < iter5; prim++){
+                    manejadorResultados.push(Db.ObtenerResumenActividad({
+                        HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                        HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON()
+                    }))
+                }
+                manejadorResultados[0].then(dat => {
+                    console.table(dat[0]);
+                })
                 break;
                 
             case 6:
-                console.log('\tActualizar Movimientos (HistorialProduccion)\n');
+                console.log('\tUnidades Por Dia y Departamento\n');
+                const iter6 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter6} datos'.`);
+                console.log('\n\n\tPor favor espere, la generación de datos puede tardar algún tiempo...');
+                for(let prim = 0; prim < iter6; prim++){
+                    manejadorResultados.push(Db.ResumenUnidadesDepa({
+                        HoraDeInicio: date({from: new Date('2000-01-01'), to: new Date('2002-12-31')}).toJSON(),
+                        HoraDeFin: date({from: new Date('2200-01-01'), to: new Date('2200-12-31')}).toJSON()
+                    }))
+                }
+                manejadorResultados[0].then(dat => {
+                    console.table(dat[0]);
+                })
                 break;
 
             case 7:
+                console.log('\tInsertar Movimientos (HistorialProduccion)\n');
+                const iter7 = prompt("Inserta cantidad de iteraciones: ");
+                console.clear();
+                console.log(`La seleccion será de '${iter7} datos'.`);
+                console.log('\n\n\tPor favor espere, la insercion de datos puede tardar algún tiempo...');
+                
+                CrearHistorialProduccion(iter7);
+                
+                for(const [i, v] of cont.entries()){
+                    Db.InsertarHistorialProduccion(v)
+                }
+
+                break;
+
+            case 8:
+                console.clear();
+                console.log('\tActualizar Movimientos (HistorialProduccion)\n');
+                console.log('\n\n\tFuncionalidad pendiente de agregar')
+                break;
+                
+            case 9:
                 console.log('\tEliminar Movimientos (HistorialProduccion)\n');
+                console.log('\tInsertar Movimientos (HistorialProduccion)\n');
+                const iter8 = prompt("Inserta Id a eliminar: ");
+                console.clear();
+                console.log('\n\n\tPor favor espere...');
+                Db.EliminarHistorialProduccion(iter8)
+                console.log('\n\n\tDato Eliminado.');
                 break;
                 
             default:
-                console.log('Ayuda?');
+                console.clear();
+                console.log('Consulta con el administrador para más detalles');
+                console.log('\n\n\ttAdministrador: ProxusTeam');
                 break;
 
 
