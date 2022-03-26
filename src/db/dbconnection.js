@@ -44,5 +44,6 @@ const InsertPersonas = async (Nombre, Apellido, Fecha) => {
 //    @IdEmpleado, @IdTarifa, @HoraDeInicio, @HoraDeFin, @IdPasos, @IdMueble
 module.exports = {
     InsertPersonas: InsertPersonas,
-    InsertarMuebles: InsertarMuebles
+    InsertarMuebles: InsertarMuebles,
+    InsertarHistorialProduccion: InsertarHistorialProduccion
 }
