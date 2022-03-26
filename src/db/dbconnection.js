@@ -27,6 +27,21 @@ const InsertPersonas = async (Nombre, Apellido, Fecha) => {
         }
    }
 
+    // Historial Produccion
+
+   const ObtenerHistorialProduccion = async(v) => {
+       console.log('horas: ', v);
+       try {
+            const pool = await sql.connect(config);
+            const historialProd = await pool.request()
+            .input('FechaInicio', sql.DateTime, v[0].HoraDeInicio.replace('T', ' ').replace('Z', ''))
+            .input('FechaFin', sql.DateTime, v[1].HoraDeFin.replace('T', ' ').replace('Z', ''))
+            .execute('TransaccionesFecha')
+            console.log(await (await historialProd).recordsets);
+            return (await historialProd).recordsets
+       } catch (err) {console.log(err);}
+   }
+
    const InsertarHistorialProduccion = async(historial) => {
        try {
            const pool = await sql.connect(config);
@@ -45,5 +60,6 @@ const InsertPersonas = async (Nombre, Apellido, Fecha) => {
 module.exports = {
     InsertPersonas: InsertPersonas,
     InsertarMuebles: InsertarMuebles,
-    InsertarHistorialProduccion: InsertarHistorialProduccion
+    InsertarHistorialProduccion: InsertarHistorialProduccion,
+    ObtenerHistorialProduccion: ObtenerHistorialProduccion
 }
